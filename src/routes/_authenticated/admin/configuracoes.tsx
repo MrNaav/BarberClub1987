@@ -45,7 +45,7 @@ function SettingsPage() {
       ) : (
         <>
           <BusinessHoursPanel key={hours.dataUpdatedAt} rows={hours.data} />
-          <GeneralSettingsPanel key={settings.dataUpdatedAt} settings={settings.data} />
+          <GeneralSettingsPanel key={settings.dataUpdatedAt} settings={settings.data!} />
           <Panel title="Bloqueios da barbearia" description="Feriados, datas fechadas ou faixas de horário bloqueadas para toda a equipe.">
             <BlocksManager barberId={null} />
           </Panel>

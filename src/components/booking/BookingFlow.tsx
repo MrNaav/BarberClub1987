@@ -431,9 +431,7 @@ export function BookingFlow() {
                     className={cn(fieldClass, "h-auto resize-none py-3")}
                   />
                 </Field>
-                <button type="submit" className="sr-only">
-                  Continuar
-                </button>
+                <button type="submit" hidden aria-hidden tabIndex={-1} />
               </form>
             </StepShell>
           )}
