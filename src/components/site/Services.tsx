@@ -120,7 +120,7 @@ export function Services() {
                             >
                               {service.name}
                             </h3>
-                            <Price value={service.price} emphasis={service.featured} />
+                            <Price value={service.price} emphasis={service.featured === true} />
                           </div>
                           <p
                             className={cn(
