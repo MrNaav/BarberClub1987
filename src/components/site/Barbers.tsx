@@ -1,9 +1,17 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { BARBER_PHOTOS, FALLBACK_BARBER_PHOTO } from "@/lib/booking/images";
+import { catalogQuery } from "@/lib/booking/queries";
 import { cn } from "@/lib/utils";
 
-import { BARBERS } from "./content";
 import { Reveal } from "./Reveal";
 
 export function Barbers() {
+  const { data: catalog } = useSuspenseQuery(catalogQuery);
+  const BARBERS = catalog.barbers.map((barber) => ({
+    ...barber,
+    image: BARBER_PHOTOS[barber.slug] ?? FALLBACK_BARBER_PHOTO,
+  }));
   return (
     <section
       id="barbeiros"
@@ -38,7 +46,7 @@ export function Barbers() {
           {BARBERS.map((barber, index) => (
             <Reveal
               as="li"
-              key={barber.name}
+              key={barber.id}
               delay={index * 120}
               className={cn(index === 1 && "lg:mt-16", index === 2 && "lg:mt-32")}
             >

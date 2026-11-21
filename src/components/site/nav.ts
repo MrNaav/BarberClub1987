@@ -5,5 +5,5 @@ export const NAV_LINKS = [
   { label: "Barbeiros", href: "#barbeiros" },
 ] as const;
 
-/** "Agendar horário" has no booking yet in this phase: it leads to the address and hours. */
-export const BOOKING_HREF = "#contato";
+/** "Agendar horário" opens the booking flow page. */
+export const BOOKING_HREF = "/agendar";

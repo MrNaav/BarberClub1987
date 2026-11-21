@@ -6,6 +6,7 @@ import { Hero } from "@/components/site/Hero";
 import { Services } from "@/components/site/Services";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { catalogQuery } from "@/lib/booking/queries";
 
 const TITLE = "Barber Club 1987 — Barbearia tradicional e premium";
 const DESCRIPTION =
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
   component: Index,
 });
 

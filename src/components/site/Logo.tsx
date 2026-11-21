@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, href = "#inicio" }: { className?: string; href?: string }) {
   return (
     <a
-      href="#inicio"
+      href={href}
       aria-label="Barber Club 1987 — voltar ao início"
       className={cn("group inline-flex items-baseline gap-2 leading-none", className)}
     >

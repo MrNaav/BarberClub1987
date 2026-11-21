@@ -1,8 +1,11 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { formatPrice } from "@/lib/booking/core";
+import { FALLBACK_SERVICE_PHOTO, SERVICE_PHOTOS } from "@/lib/booking/images";
+import { catalogQuery } from "@/lib/booking/queries";
 import { cn } from "@/lib/utils";
 
-import { SERVICES, formatPrice } from "./content";
 import { Reveal } from "./Reveal";
 
 function Price({ value, emphasis }: { value: number; emphasis?: boolean }) {
@@ -29,6 +32,18 @@ function Price({ value, emphasis }: { value: number; emphasis?: boolean }) {
 }
 
 export function Services() {
+  const { data: catalog } = useSuspenseQuery(catalogQuery);
+  const SERVICES = catalog.services.map((service) => {
+    const photo = SERVICE_PHOTOS[service.slug] ?? FALLBACK_SERVICE_PHOTO;
+    return {
+      ...service,
+      price: service.price_cents,
+      featured: service.is_featured,
+      image: photo.src,
+      alt: photo.alt,
+    };
+  });
+  const hasDemoPrices = SERVICES.some((service) => service.price_is_demo);
   const [active, setActive] = useState(0);
   const current = SERVICES[active];
 
@@ -60,11 +75,18 @@ export function Services() {
 
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-6">
+            {SERVICES.length === 0 && (
+              <p className="border-t border-hairline pt-9 text-[0.9375rem] text-stone">
+                {catalog.ok
+                  ? "Nenhum serviço disponível no momento."
+                  : "Não foi possível carregar os serviços agora. Tente novamente em instantes."}
+              </p>
+            )}
             <ol className="grid gap-16 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-20 lg:flex lg:flex-col lg:gap-0">
               {SERVICES.map((service, index) => {
                 const isActive = active === index;
                 return (
-                  <Reveal as="li" key={service.name} delay={index * 80}>
+                  <Reveal as="li" key={service.id} delay={index * 80}>
                     <div
                       onMouseEnter={() => setActive(index)}
                       className={cn(
@@ -120,7 +142,7 @@ export function Services() {
                             >
                               {service.name}
                             </h3>
-                            <Price value={service.price} emphasis={service.featured === true} />
+                            <Price value={service.price} emphasis={service.featured} />
                           </div>
                           <p
                             className={cn(
@@ -137,18 +159,20 @@ export function Services() {
                 );
               })}
             </ol>
-            <Reveal delay={200}>
-              <p className="eyebrow mt-12 text-stone/80 lg:mt-8 lg:pl-6">
-                Valores demonstrativos
-              </p>
-            </Reveal>
+            {hasDemoPrices && (
+              <Reveal delay={200}>
+                <p className="eyebrow mt-12 text-stone/80 lg:mt-8 lg:pl-6">
+                  Valores demonstrativos
+                </p>
+              </Reveal>
+            )}
           </div>
 
           <div aria-hidden className="relative hidden lg:col-span-5 lg:col-start-8 lg:block">
             <div className="sticky top-28 aspect-[4/5] overflow-hidden bg-ink-soft">
               {SERVICES.map((service, index) => (
                 <img
-                  key={service.name}
+                  key={service.id}
                   src={service.image}
                   alt=""
                   width={1024}

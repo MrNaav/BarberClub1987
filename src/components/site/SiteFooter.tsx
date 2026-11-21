@@ -1,13 +1,14 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { summarizeOpeningHours } from "@/lib/booking/core";
+import { catalogQuery } from "@/lib/booking/queries";
+
 import { Logo } from "./Logo";
 import { NAV_LINKS } from "./nav";
 
-const HOURS = [
-  ["Terça a sexta", "10h — 20h"],
-  ["Sábado", "09h — 18h"],
-  ["Domingo e segunda", "Fechado"],
-] as const;
-
 export function SiteFooter() {
+  const { data: catalog } = useSuspenseQuery(catalogQuery);
+  const HOURS = summarizeOpeningHours(catalog.hours);
   return (
     <footer id="contato" className="scroll-mt-[4.5rem] border-t border-hairline bg-ink">
       <div className="container-editorial grid grid-cols-2 gap-x-6 gap-y-12 py-16 lg:grid-cols-12 lg:gap-10 lg:py-20">
