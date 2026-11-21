@@ -251,8 +251,8 @@ export function summarizeOpeningHours(hours: readonly OpeningHours[]): [string, 
   groups.sort((a, b) => Number(a.value === "Fechado") - Number(b.value === "Fechado"));
 
   return groups.map(({ days, value }) => {
-    const first = DAY_LABELS[days[0]!];
-    const lastDay = DAY_LABELS[days[days.length - 1]!];
+    const first = DAY_LABELS[days[0] ?? 0] ?? "";
+    const lastDay = DAY_LABELS[days[days.length - 1] ?? 0] ?? "";
     let name: string;
     if (days.length === 1) name = first;
     else if (days.length === 2) name = `${first} e ${lastDay.toLowerCase()}`;
