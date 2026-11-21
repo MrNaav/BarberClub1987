@@ -27,8 +27,10 @@ import {
   weekdayOfKey,
 } from "@/lib/booking/core";
 import { cn } from "@/lib/utils";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/agenda")({
+  head: () => adminHead("Agenda do dia", "Agenda diária por barbeiro da Barber Club 1987."),
   component: AgendaPage,
 });
 
@@ -85,7 +87,7 @@ function buildSegments(opts: {
       const blk = blks.find((x) => t >= x.start && t < x.end);
       if (blk) next = { kind: "block", start: t, end: t + TICK, reason: blk.b.reason };
       else if (!working || t < working.start || t >= working.end) next = { kind: "off", start: t, end: t + TICK };
-      else if (breaks.some(([s, e]) => t >= s! && t < e!)) next = { kind: "break", start: t, end: t + TICK };
+      else if (breaks.some(([s, e]) => s !== undefined && e !== undefined && t >= s && t < e)) next = { kind: "break", start: t, end: t + TICK };
       else next = { kind: "free", start: t, end: t + TICK };
     }
     const last = segments[segments.length - 1];
@@ -172,7 +174,7 @@ function AgendaPage() {
       {loading ? (
         <LoadingRows rows={8} />
       ) : failed ? (
-        <ErrorState message={friendlyError(failed, "Não foi possível carregar a agenda.")} onRetry={() => appts.refetch()} />
+        <ErrorState message={friendlyError(failed, "Não foi possível carregar a agenda.")} onRetry={() => { appts.refetch(); barbers.refetch(); barberHours.refetch(); shopHours.refetch(); blocks.refetch(); }} />
       ) : (
         <>
           {/* Barber switcher for phones */}

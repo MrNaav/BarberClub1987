@@ -433,6 +433,11 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      save_barber_profile: {
+        Args: { p_barber_id: string; p_profile: Json; p_service_ids: string[] }
+        Returns: undefined
+      }
+      save_business_hours: { Args: { p_rows: Json }; Returns: undefined }
     }
     Enums: {
       app_role: "admin"

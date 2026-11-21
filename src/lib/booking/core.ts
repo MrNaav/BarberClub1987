@@ -59,9 +59,13 @@ export function formatPrice(cents: number): string {
 
 /** Parses "75", "75,50" or "75.5" into cents. Returns null when invalid. */
 export function parsePriceToCents(input: string): number | null {
-  const normalized = input.trim().replace(/^R\$\s*/i, "").replace(/\./g, "").replace(",", ".");
+  const value = input.trim().replace(/^R\$\s*/i, "");
+  const normalized = value.includes(",")
+    ? (/^(?:\d+|\d{1,3}(?:\.\d{3})+),\d{1,2}$/.test(value) ? value.replace(/\./g, "").replace(",", ".") : "")
+    : (/^\d{1,3}(?:\.\d{3})+$/.test(value) ? value.replace(/\./g, "") : value);
   if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return null;
-  return Math.round(Number(normalized) * 100);
+  const cents = Math.round(Number(normalized) * 100);
+  return Number.isSafeInteger(cents) ? cents : null;
 }
 
 export function formatDuration(minutes: number): string {
@@ -277,6 +281,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   USE_RESCHEDULE: "Para mudar data, horário ou barbeiro, use a opção Reagendar.",
   FORBIDDEN: "Você não tem permissão para esta ação.",
   NOT_FOUND: "Agendamento não encontrado.",
+  INVALID_HOURS: "Informe os sete dias da semana com horários válidos.",
+  INVALID_SERVICES: "Confira os serviços selecionados para o barbeiro.",
 };
 
 /** Maps a backend error (code or message) to a friendly sentence, never the raw error. */
@@ -292,6 +298,7 @@ export function friendlyError(error: unknown, fallback = "Algo deu errado. Tente
   }
   if (/jwt|token|session/i.test(text)) return "Sua sessão expirou. Entre novamente.";
   if (/fetch|network|Failed to/i.test(text)) return "Sem conexão com o servidor. Verifique sua internet e tente novamente.";
-  if (/appointments_no_overlap|exclusion/i.test(text)) return ERROR_MESSAGES["SLOT_UNAVAILABLE"]!;
+  if (/appointments_no_overlap|exclusion/i.test(text)) return ERROR_MESSAGES["SLOT_UNAVAILABLE"] ?? fallback;
+  if (/appointments_brazilian_phone/i.test(text)) return ERROR_MESSAGES["INVALID_PHONE"] ?? fallback;
   return fallback;
 }

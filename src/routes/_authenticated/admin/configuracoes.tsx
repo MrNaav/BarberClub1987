@@ -16,8 +16,10 @@ import {
   type SettingsRow,
 } from "@/lib/admin/api";
 import { friendlyError } from "@/lib/booking/core";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
+  head: () => adminHead("Configurações da agenda", "Horários e regras de reserva da Barber Club 1987."),
   component: SettingsPage,
 });
 
@@ -45,7 +47,7 @@ function SettingsPage() {
       ) : (
         <>
           <BusinessHoursPanel key={hours.dataUpdatedAt} rows={hours.data} />
-          <GeneralSettingsPanel key={settings.dataUpdatedAt} settings={settings.data!} />
+          <GeneralSettingsPanel key={settings.dataUpdatedAt} settings={settings.data} />
           <Panel title="Bloqueios da barbearia" description="Feriados, datas fechadas ou faixas de horário bloqueadas para toda a equipe.">
             <BlocksManager barberId={null} />
           </Panel>
@@ -141,6 +143,7 @@ function GeneralSettingsPanel({ settings }: { settings: SettingsRow }) {
     const found: Record<string, string> = {};
     const days = Number(maxDays);
     const buf = Number(buffer);
+    if (Number(notice) > days * 1440) found["maxDays"] = "O limite de dias precisa comportar a antecedência mínima.";
     if (!Number.isInteger(days) || days < 1 || days > 180) found["maxDays"] = "Entre 1 e 180 dias.";
     if (!Number.isInteger(buf) || buf < 0 || buf > 120) found["buffer"] = "Entre 0 e 120 minutos.";
     setErrors(found);

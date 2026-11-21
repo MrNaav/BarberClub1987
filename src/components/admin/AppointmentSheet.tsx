@@ -77,7 +77,11 @@ export function AppointmentSheet({
     setPendingStatus(null);
   }, [appointment?.id]);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin", "appointments"] });
+  const refresh = () => Promise.all([
+    queryClient.invalidateQueries({ queryKey: ["admin", "appointments"] }),
+    queryClient.invalidateQueries({ queryKey: ["admin", "reschedule-slots"] }),
+    queryClient.invalidateQueries({ queryKey: ["public"] }),
+  ]);
 
   const applyStatus = async () => {
     if (!appointment || !pendingStatus) return;

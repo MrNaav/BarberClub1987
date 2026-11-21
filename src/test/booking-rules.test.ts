@@ -27,6 +27,14 @@ describe("Preços", () => {
     expect(parsePriceToCents("abc")).toBeNull();
   });
 
+  it("não multiplica preços decimais por cem indevidamente", () => {
+    expect(parsePriceToCents("75.5")).toBe(7550);
+    expect(parsePriceToCents("75.50")).toBe(7550);
+    expect(parsePriceToCents("1.200")).toBe(120000);
+    expect(parsePriceToCents("1.20,50")).toBeNull();
+    expect(parsePriceToCents("-75")).toBeNull();
+  });
+
   it("formata a duração", () => {
     expect(formatDuration(45)).toBe("45 min");
     expect(formatDuration(75)).toBe("1h15");

@@ -39,6 +39,8 @@ export function BlocksManager({ barberId, barbers }: { barberId: string | null; 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate) || (allDay && !/^\d{4}-\d{2}-\d{2}$/.test(endDate)))
+      return setError("Preencha as datas do bloqueio.");
     let startsAt: string;
     let endsAt: string;
     if (allDay) {
@@ -56,7 +58,11 @@ export function BlocksManager({ barberId, barbers }: { barberId: string | null; 
       await addBlock({ barber_id: barberId, starts_at: startsAt, ends_at: endsAt, reason: reason.trim() });
       toast.success("Bloqueio adicionado.");
       setReason("");
-      await queryClient.invalidateQueries({ queryKey: ["admin", "blocks"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "blocks"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "reschedule-slots"] }),
+        queryClient.invalidateQueries({ queryKey: ["public"] }),
+      ]);
     } catch (err) {
       toast.error(friendlyError(err, "Não foi possível adicionar o bloqueio."));
     } finally {
@@ -71,7 +77,11 @@ export function BlocksManager({ barberId, barbers }: { barberId: string | null; 
       await removeBlock(toRemove);
       toast.success("Bloqueio removido.");
       setToRemove(null);
-      await queryClient.invalidateQueries({ queryKey: ["admin", "blocks"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin", "blocks"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin", "reschedule-slots"] }),
+        queryClient.invalidateQueries({ queryKey: ["public"] }),
+      ]);
     } catch (err) {
       toast.error(friendlyError(err, "Não foi possível remover o bloqueio."));
     } finally {

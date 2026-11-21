@@ -15,6 +15,20 @@
       "when": 1795291413953,
       "tag": "0001_tighten_visitor_access",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795292874866,
+      "tag": "0002_audit_access_and_validation",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795293044544,
+      "tag": "0003_audit_atomic_admin_saves",
+      "breakpoints": true
     }
   ]
 }

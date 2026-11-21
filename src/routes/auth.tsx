@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Logo } from "@/components/site/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { safeAdminDestination } from "@/lib/auth/destination";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
@@ -26,14 +27,7 @@ export const Route = createFileRoute("/auth")({
 
 /** Only same-origin admin paths are accepted as a destination after sign-in. */
 function safeDestination(value: string | undefined): string {
-  if (!value) return "/admin";
-  try {
-    const url = new URL(value, window.location.origin);
-    if (url.origin !== window.location.origin || !url.pathname.startsWith("/admin")) return "/admin";
-    return url.pathname + url.search;
-  } catch {
-    return "/admin";
-  }
+  return safeAdminDestination(value, window.location.origin);
 }
 
 function AuthPage() {
@@ -132,6 +126,9 @@ function AuthPage() {
             )}
             <Button type="submit" variant="bronze" size="cta" disabled={busy} className="mt-2 w-full">
               {busy ? "Entrando…" : "Entrar"}
+            </Button>
+            <Button asChild variant="link" className="self-start p-0 text-stone">
+              <a href="/recuperar-acesso">Esqueci minha senha</a>
             </Button>
           </form>
         </div>

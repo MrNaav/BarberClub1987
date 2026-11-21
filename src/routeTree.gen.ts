@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AgendarRouteImport } from './routes/agendar'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as RecuperarAcessoRouteImport } from './routes/recuperar-acesso'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAgendaRouteImport } from './routes/_authenticated/admin/agenda'
@@ -38,6 +40,16 @@ const AgendarRoute = AgendarRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarAcessoRoute = RecuperarAcessoRouteImport.update({
+  id: '/recuperar-acesso',
+  path: '/recuperar-acesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -85,6 +97,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/recuperar-acesso': typeof RecuperarAcessoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/admin/agenda': typeof AuthenticatedAdminAgendaRoute
   '/admin/agendamentos': typeof AuthenticatedAdminAgendamentosRoute
@@ -97,6 +111,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/recuperar-acesso': typeof RecuperarAcessoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/admin/agenda': typeof AuthenticatedAdminAgendaRoute
   '/admin/agendamentos': typeof AuthenticatedAdminAgendamentosRoute
   '/admin/barbeiros': typeof AuthenticatedAdminBarbeirosRoute
@@ -110,6 +126,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/recuperar-acesso': typeof RecuperarAcessoRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/admin/agenda': typeof AuthenticatedAdminAgendaRoute
   '/_authenticated/admin/agendamentos': typeof AuthenticatedAdminAgendamentosRoute
@@ -124,6 +142,8 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/recuperar-acesso'
+    | '/redefinir-senha'
     | '/admin'
     | '/admin/agenda'
     | '/admin/agendamentos'
@@ -136,6 +156,8 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/recuperar-acesso'
+    | '/redefinir-senha'
     | '/admin/agenda'
     | '/admin/agendamentos'
     | '/admin/barbeiros'
@@ -148,6 +170,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/agendar'
     | '/auth'
+    | '/recuperar-acesso'
+    | '/redefinir-senha'
     | '/_authenticated/admin'
     | '/_authenticated/admin/agenda'
     | '/_authenticated/admin/agendamentos'
@@ -162,6 +186,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgendarRoute: typeof AgendarRoute
   AuthRoute: typeof AuthRoute
+  RecuperarAcessoRoute: typeof RecuperarAcessoRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +218,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-acesso': {
+      id: '/recuperar-acesso'
+      path: '/recuperar-acesso'
+      fullPath: '/recuperar-acesso'
+      preLoaderRoute: typeof RecuperarAcessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -286,6 +326,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgendarRoute: AgendarRoute,
   AuthRoute: AuthRoute,
+  RecuperarAcessoRoute: RecuperarAcessoRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

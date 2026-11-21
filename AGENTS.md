@@ -38,3 +38,6 @@ use the editor.
 - Appointments store snapshots of service name, price, duration and barber name; a trigger enforces status transitions and blocks direct time/barber edits outside the reschedule function, so history never changes when the catalog does.
 - Admin pages live under `src/routes/_authenticated/admin/` and query through the signed-in browser client; row-level security with `is_admin()` is the real access boundary, the route check is only UX.
 - Shop time is America/Sao_Paulo with a fixed -03:00 offset in client helpers (`src/lib/booking/core.ts`), since Brazil has no daylight saving time; the database uses the timezone name from `booking_settings`.
+- Admin provisioning must be an explicit trusted role assignment, never automatic on account creation, because signup settings can change independently of role security.
+- Administrative leaf routes use shared non-indexable metadata; password recovery uses the existing auth provider and public callback pages, with delivery verified separately from request acceptance.
+- Weekly shop hours and barber profile/service assignments are saved by transactional, admin-checked database functions to avoid partial saves; appointment reads paginate with a stable secondary key instead of silently truncating indicators.

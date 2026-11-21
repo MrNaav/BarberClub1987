@@ -17,8 +17,10 @@ import {
   todayKey,
 } from "@/lib/booking/core";
 import { cn } from "@/lib/utils";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  head: () => adminHead("Visão geral", "Indicadores e próximos agendamentos da Barber Club 1987."),
   component: Overview,
 });
 

@@ -9,8 +9,10 @@ import { Switch } from "@/components/ui/switch";
 import { servicesQuery, updateService, type ServiceRow } from "@/lib/admin/api";
 import { formatDuration, formatPrice, friendlyError, parsePriceToCents } from "@/lib/booking/core";
 import { cn } from "@/lib/utils";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/servicos")({
+  head: () => adminHead("Serviços e preços", "Gestão do catálogo de serviços da Barber Club 1987."),
   component: ServicesPage,
 });
 
@@ -78,13 +80,13 @@ function ServiceEditor({ service }: { service: ServiceRow }) {
     if (cents === null || cents > 10_000_000) found["price"] = "Valor inválido. Ex.: 75 ou 75,50.";
     if (!Number.isInteger(minutes) || minutes < 5 || minutes > 480) found["duration"] = "Entre 5 e 480 minutos.";
     setErrors(found);
-    if (Object.keys(found).length) return;
+    if (Object.keys(found).length || cents === null) return;
     setBusy(true);
     try {
       await updateService(service.id, {
         name: name.trim(),
         description: description.trim(),
-        price_cents: cents!,
+        price_cents: cents,
         duration_minutes: minutes,
         is_active: active,
         price_is_demo: demo,
@@ -104,7 +106,7 @@ function ServiceEditor({ service }: { service: ServiceRow }) {
   return (
     <section className={cn("border bg-ink-soft", active ? "border-hairline" : "border-dashed border-hairline")}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-5 py-4 sm:px-6">
-        <div className="flex min-w-0 items-baseline gap-4">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1">
           <h2 className="truncate font-display text-2xl text-ivory">{service.name}</h2>
           <span className="text-sm tabular-nums text-stone">
             {formatPrice(service.price_cents)} · {formatDuration(service.duration_minutes)}
@@ -128,10 +130,7 @@ function ServiceEditor({ service }: { service: ServiceRow }) {
             id={`sv-price-${service.id}`}
             inputMode="decimal"
             value={price}
-            onChange={(e) => {
-              setPrice(e.target.value);
-              if (parsePriceToCents(e.target.value) !== service.price_cents) setDemo(false);
-            }}
+            onChange={(e) => setPrice(e.target.value)}
             className={inputClass}
           />
         </FormField>

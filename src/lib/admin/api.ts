@@ -18,9 +18,10 @@ export type BusinessHoursRow = Tables["business_hours"]["Row"];
 export type BlockRow = Tables["schedule_blocks"]["Row"];
 export type SettingsRow = Tables["booking_settings"]["Row"];
 
-function unwrap<T>(result: { data: T | null; error: { message: string } | null }): T {
+function unwrap<T>(result: { data: T | null; error: { message: string } | null }): NonNullable<T> {
   if (result.error) throw new Error(result.error.message);
-  return result.data as T;
+  if (result.data === null || result.data === undefined) throw new Error("EMPTY_RESPONSE");
+  return result.data as NonNullable<T>;
 }
 
 export type AppointmentFilters = {
@@ -36,13 +37,15 @@ export const appointmentsQuery = (filters: AppointmentFilters) =>
   queryOptions({
     queryKey: ["admin", "appointments", filters],
     queryFn: async () => {
+      const fetchPage = (offset: number) => {
       let q = supabase
         .from("appointments")
         .select("*")
         .gte("starts_at", localToIso(filters.from, "00:00"))
         .lt("starts_at", localToIso(addDaysToKey(filters.to, 1), "00:00"))
         .order("starts_at", { ascending: true })
-        .limit(1000);
+        .order("id", { ascending: true })
+        .range(offset, offset + 999);
       if (filters.barberId) q = q.eq("barber_id", filters.barberId);
       if (filters.serviceId) q = q.eq("service_id", filters.serviceId);
       if (filters.status) q = q.eq("status", filters.status);
@@ -55,7 +58,15 @@ export const appointmentsQuery = (filters: AppointmentFilters) =>
             ? q.like("customer_phone", `%${digits}%`)
             : q.ilike("customer_name", `%${safe}%`);
       }
-      return unwrap(await q);
+      return q;
+      };
+      const rows: Appointment[] = [];
+      for (let offset = 0; ; offset += 1000) {
+        const page = unwrap(await fetchPage(offset));
+        rows.push(...page);
+        if (page.length < 1000) break;
+      }
+      return rows;
     },
     refetchInterval: 30_000,
   });
@@ -157,31 +168,13 @@ export async function updateService(id: string, values: Tables["services"]["Upda
   unwrap(await supabase.from("services").update(values).eq("id", id).select("id").single());
 }
 
-export async function updateBarber(id: string, values: Tables["barbers"]["Update"]) {
-  unwrap(await supabase.from("barbers").update(values).eq("id", id).select("id").single());
-}
-
-export async function setBarberServices(barberId: string, serviceIds: string[], current: string[]) {
-  const toAdd = serviceIds.filter((id) => !current.includes(id));
-  const toRemove = current.filter((id) => !serviceIds.includes(id));
-  if (toAdd.length) {
-    unwrap(
-      await supabase
-        .from("barber_services")
-        .insert(toAdd.map((service_id) => ({ barber_id: barberId, service_id })))
-        .select("barber_id"),
-    );
-  }
-  if (toRemove.length) {
-    unwrap(
-      await supabase
-        .from("barber_services")
-        .delete()
-        .eq("barber_id", barberId)
-        .in("service_id", toRemove)
-        .select("barber_id"),
-    );
-  }
+export async function saveBarberProfile(barberId: string, profile: {
+  name: string; role: string; specialty: string; bio: string; is_active: boolean;
+}, serviceIds: string[]) {
+  const { error } = await supabase.rpc("save_barber_profile", {
+    p_barber_id: barberId, p_profile: profile, p_service_ids: serviceIds,
+  });
+  if (error) throw new Error(error.message);
 }
 
 export async function saveBarberHours(rows: Tables["barber_weekly_hours"]["Insert"][]) {
@@ -194,13 +187,8 @@ export async function saveBarberHours(rows: Tables["barber_weekly_hours"]["Inser
 }
 
 export async function saveBusinessHours(rows: Tables["business_hours"]["Update"][]) {
-  for (const row of rows) {
-    const { weekday, ...values } = row;
-    if (weekday === undefined) continue;
-    unwrap(
-      await supabase.from("business_hours").update(values).eq("weekday", weekday).select("weekday").single(),
-    );
-  }
+  const { error } = await supabase.rpc("save_business_hours", { p_rows: rows });
+  if (error) throw new Error(error.message);
 }
 
 export async function saveSettings(values: Tables["booking_settings"]["Update"]) {

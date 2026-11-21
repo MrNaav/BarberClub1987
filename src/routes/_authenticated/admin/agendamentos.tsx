@@ -29,8 +29,10 @@ import {
   type AppointmentStatus,
 } from "@/lib/booking/core";
 import { cn } from "@/lib/utils";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/agendamentos")({
+  head: () => adminHead("Agendamentos", "Gestão administrativa das reservas da Barber Club 1987."),
   component: AppointmentsPage,
 });
 

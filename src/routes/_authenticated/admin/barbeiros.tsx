@@ -22,8 +22,7 @@ import {
   barbersQuery,
   saveBarberHours,
   servicesQuery,
-  setBarberServices,
-  updateBarber,
+  saveBarberProfile,
   type BarberHoursRow,
   type BarberRow,
   type ServiceRow,
@@ -31,8 +30,10 @@ import {
 import { friendlyError } from "@/lib/booking/core";
 import { BARBER_PHOTOS, FALLBACK_BARBER_PHOTO } from "@/lib/booking/images";
 import { cn } from "@/lib/utils";
+import { adminHead } from "@/lib/admin/metadata";
 
 export const Route = createFileRoute("/_authenticated/admin/barbeiros")({
+  head: () => adminHead("Equipe", "Perfis e disponibilidade dos barbeiros da Barber Club 1987."),
   component: BarbersPage,
 });
 
@@ -57,11 +58,11 @@ function BarbersPage() {
       {loading ? (
         <LoadingRows rows={5} />
       ) : failed ? (
-        <ErrorState message={friendlyError(failed, "Não foi possível carregar a equipe.")} onRetry={() => barbers.refetch()} />
+        <ErrorState message={friendlyError(failed, "Não foi possível carregar a equipe.")} onRetry={() => { barbers.refetch(); services.refetch(); links.refetch(); hours.refetch(); }} />
       ) : (
         <>
           <div className="grid gap-2 sm:grid-cols-3" role="tablist" aria-label="Barbeiros">
-            {barbers.data!.map((b) => (
+            {(barbers.data ?? []).map((b) => (
               <button
                 key={b.id}
                 type="button"
@@ -85,9 +86,9 @@ function BarbersPage() {
             <BarberDetail
               key={`${current.id}-${current.updated_at}`}
               barber={current}
-              services={services.data!}
-              serviceIds={links.data!.filter((l) => l.barber_id === current.id).map((l) => l.service_id)}
-              hours={hours.data!.filter((h) => h.barber_id === current.id)}
+              services={services.data ?? []}
+              serviceIds={(links.data ?? []).filter((l) => l.barber_id === current.id).map((l) => l.service_id)}
+              hours={(hours.data ?? []).filter((h) => h.barber_id === current.id)}
             />
           )}
         </>
@@ -150,14 +151,13 @@ function BarberDetail({
     if (Object.keys(found).length) return;
     setBusy(true);
     try {
-      await updateBarber(barber.id, {
+      await saveBarberProfile(barber.id, {
         name: name.trim(),
         role: role.trim(),
         specialty: specialty.trim(),
         bio: bio.trim(),
         is_active: active,
-      });
-      await setBarberServices(barber.id, selectedServices, serviceIds);
+      }, selectedServices);
       toast.success("Perfil atualizado.");
       await refresh();
     } catch (error) {

@@ -58,7 +58,7 @@ export const getPublicCatalog = createServerFn({ method: "GET" }).handler(
           .order("sort_order"),
         db.from("barber_services").select("barber_id, service_id"),
         db.from("business_hours").select("weekday, is_open, open_time, close_time").order("weekday"),
-        db.from("booking_settings").select("max_days_ahead").eq("id", 1).maybeSingle(),
+        db.from("booking_settings").select("max_days_ahead").maybeSingle(),
       ]);
       const failed = [services, barbers, links, hours, settings].find((r) => r.error);
       if (failed?.error) throw failed.error;
