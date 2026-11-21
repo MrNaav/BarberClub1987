@@ -33,3 +33,8 @@ use the editor.
 
 - The landing page is one scrolling page at `/` built from section components in `src/components/site/`; header links are in-page anchors with smooth scroll because the brief asks for a single landing page with section navigation.
 - Brand colors live only as tokens in `src/styles.css` (ink, graphite, bronze, ivory, stone…); components use those token classes, never raw hex, so the fixed brand palette stays enforceable.
+- Services, barbers, hours and prices live only in the database; the landing, the `/agendar` flow and the admin panel all read the same tables, and photos are mapped by slug in `src/lib/booking/images.ts`, so the dashboard is the single source of truth.
+- Availability and booking rules run in Postgres (`get_available_slots`, `book_appointment`, `admin_reschedule_appointment`) plus an exclusion constraint on active appointments, because conflicts must be rejected server-side even under simultaneous requests; never compute or trust availability only in the browser.
+- Appointments store snapshots of service name, price, duration and barber name; a trigger enforces status transitions and blocks direct time/barber edits outside the reschedule function, so history never changes when the catalog does.
+- Admin pages live under `src/routes/_authenticated/admin/` and query through the signed-in browser client; row-level security with `is_admin()` is the real access boundary, the route check is only UX.
+- Shop time is America/Sao_Paulo with a fixed -03:00 offset in client helpers (`src/lib/booking/core.ts`), since Brazil has no daylight saving time; the database uses the timezone name from `booking_settings`.
