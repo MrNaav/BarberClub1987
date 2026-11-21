@@ -1,45 +1,36 @@
 import { useState } from "react";
 
-import acabamentoImage from "@/assets/service-acabamento.jpg";
-import barbaImage from "@/assets/service-barba.jpg";
-import corteBarbaImage from "@/assets/service-corte-barba.jpg";
-import corteImage from "@/assets/service-corte.jpg";
 import { cn } from "@/lib/utils";
 
+import { SERVICES, formatPrice } from "./content";
 import { Reveal } from "./Reveal";
 
-const SERVICES = [
-  {
-    name: "Corte tradicional",
-    description:
-      "Tesoura e máquina conduzidas com precisão, respeitando o formato do rosto e o seu estilo.",
-    image: corteImage,
-    alt: "Barbeiro cortando cabelo com tesoura e pente",
-  },
-  {
-    name: "Corte + barba",
-    description: "O ritual completo: corte sob medida e barba desenhada, em um único atendimento.",
-    image: corteBarbaImage,
-    alt: "Cliente com corte degradê e barba alinhada na cadeira de couro",
-  },
-  {
-    name: "Barba completa",
-    description:
-      "Toalha quente, navalha e acabamento cuidadoso para uma barba alinhada e confortável.",
-    image: barbaImage,
-    alt: "Barbeiro fazendo a barba com navalha e espuma",
-  },
-  {
-    name: "Acabamento e sobrancelha",
-    description:
-      "Contornos, pezinho e sobrancelha ajustados para manter o visual impecável entre os cortes.",
-    image: acabamentoImage,
-    alt: "Máquina, navalha, pente e pincel sobre bancada de madeira",
-  },
-] as const;
+function Price({ value, emphasis }: { value: number; emphasis?: boolean }) {
+  const [currency, amount] = formatPrice(value).split(" ");
+  return (
+    <span
+      aria-label={formatPrice(value)}
+      className="flex shrink-0 items-baseline gap-1.5 whitespace-nowrap"
+    >
+      <span aria-hidden className="eyebrow text-stone">
+        {currency}
+      </span>
+      <span
+        aria-hidden
+        className={cn(
+          "font-display text-[2rem] font-medium leading-none sm:text-[2.25rem] lg:text-[2.5rem]",
+          emphasis ? "text-bronze-light" : "text-ivory",
+        )}
+      >
+        {amount}
+      </span>
+    </span>
+  );
+}
 
 export function Services() {
   const [active, setActive] = useState(0);
+  const current = SERVICES[active];
 
   return (
     <section id="servicos" aria-labelledby="servicos-title" className="relative bg-ink">
@@ -48,7 +39,7 @@ export function Services() {
           <Reveal className="lg:col-span-7">
             <p className="eyebrow flex items-center gap-4 text-bronze">
               <span aria-hidden className="h-px w-10 bg-bronze" />
-              Serviços
+              Serviços e preços
             </p>
             <h2
               id="servicos-title"
@@ -68,55 +59,90 @@ export function Services() {
         </div>
 
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-10">
-          <ol className="grid gap-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-16 lg:col-span-6 lg:flex lg:flex-col lg:gap-0">
-            {SERVICES.map((service, index) => (
-              <Reveal as="li" key={service.name} delay={index * 80}>
-                <div
-                  onMouseEnter={() => setActive(index)}
-                  className="group lg:cursor-default lg:border-t lg:border-hairline lg:py-9 lg:last:border-b"
-                >
-                  <div className="relative mb-6 aspect-[4/5] overflow-hidden sm:aspect-[3/4] lg:hidden">
-                    <img
-                      src={service.image}
-                      alt={service.alt}
-                      width={1024}
-                      height={1536}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex items-baseline gap-6 lg:gap-10">
-                    <span
+          <div className="lg:col-span-6">
+            <ol className="grid gap-16 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-20 lg:flex lg:flex-col lg:gap-0">
+              {SERVICES.map((service, index) => {
+                const isActive = active === index;
+                return (
+                  <Reveal as="li" key={service.name} delay={index * 80}>
+                    <div
+                      onMouseEnter={() => setActive(index)}
                       className={cn(
-                        "eyebrow shrink-0 transition-colors duration-500",
-                        active === index ? "text-bronze" : "text-stone lg:text-stone/60",
+                        "group relative lg:cursor-default lg:border-t lg:border-hairline lg:py-9 lg:pl-6",
+                        index === SERVICES.length - 1 && "lg:border-b",
                       )}
                     >
-                      0{index + 1}
-                    </span>
-                    <div>
-                      <h3
+                      <span
+                        aria-hidden
                         className={cn(
-                          "font-display text-3xl font-medium leading-tight transition-colors duration-500 sm:text-[2.125rem] lg:text-[2.5rem]",
-                          active === index ? "text-ivory" : "text-ivory lg:text-ivory/45",
+                          "absolute left-0 top-9 hidden h-[calc(100%-4.5rem)] w-px origin-top bg-bronze transition-transform duration-700 ease-[var(--ease-editorial)] lg:block",
+                          isActive ? "scale-y-100" : "scale-y-0",
                         )}
-                      >
-                        {service.name}
-                      </h3>
-                      <p
-                        className={cn(
-                          "mt-3 max-w-md text-[0.9375rem] leading-relaxed text-stone transition-opacity duration-500",
-                          active === index ? "lg:opacity-100" : "lg:opacity-60",
+                      />
+
+                      <div className="relative mb-7 aspect-[4/5] overflow-hidden bg-ink-soft sm:aspect-[3/4] lg:hidden">
+                        <img
+                          src={service.image}
+                          alt={service.alt}
+                          width={1024}
+                          height={1536}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                        {service.featured && (
+                          <span className="eyebrow absolute left-0 top-0 bg-ink px-4 py-3 text-bronze-light">
+                            Destaque da casa
+                          </span>
                         )}
-                      >
-                        {service.description}
-                      </p>
+                      </div>
+
+                      <div className="flex items-start gap-5 sm:gap-6 lg:gap-10">
+                        <span
+                          className={cn(
+                            "eyebrow shrink-0 pt-3 transition-colors duration-500",
+                            isActive ? "text-bronze" : "text-stone lg:text-stone/60",
+                          )}
+                        >
+                          0{index + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          {service.featured && (
+                            <p className="eyebrow mb-3 hidden text-bronze lg:block">
+                              Destaque da casa
+                            </p>
+                          )}
+                          <div className="flex items-baseline justify-between gap-5 border-b border-hairline pb-4 lg:border-0 lg:pb-0">
+                            <h3
+                              className={cn(
+                                "min-w-0 font-display text-[1.875rem] font-medium leading-[1.05] transition-colors duration-500 sm:text-[2rem] lg:text-[2.5rem]",
+                                isActive ? "text-ivory" : "text-ivory lg:text-ivory/45",
+                              )}
+                            >
+                              {service.name}
+                            </h3>
+                            <Price value={service.price} emphasis={service.featured} />
+                          </div>
+                          <p
+                            className={cn(
+                              "mt-4 max-w-md text-[0.9375rem] leading-relaxed text-stone transition-opacity duration-500 lg:mt-3",
+                              isActive ? "lg:opacity-100" : "lg:opacity-60",
+                            )}
+                          >
+                            {service.description}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
+                  </Reveal>
+                );
+              })}
+            </ol>
+            <Reveal delay={200}>
+              <p className="eyebrow mt-12 text-stone/80 lg:mt-8 lg:pl-6">
+                Valores demonstrativos
+              </p>
+            </Reveal>
+          </div>
 
           <div aria-hidden className="relative hidden lg:col-span-5 lg:col-start-8 lg:block">
             <div className="sticky top-28 aspect-[4/5] overflow-hidden bg-ink-soft">
@@ -134,11 +160,23 @@ export function Services() {
                   )}
                 />
               ))}
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-[image:var(--overlay-portrait)] p-7 pt-24">
+              {current?.featured && (
+                <span className="eyebrow absolute left-0 top-0 bg-ink px-5 py-3.5 text-bronze-light">
+                  Destaque da casa
+                </span>
+              )}
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 bg-[image:var(--overlay-portrait)] p-7 pt-24">
                 <span className="font-display text-7xl leading-none text-ivory/90">
                   0{active + 1}
                 </span>
-                <span className="eyebrow text-bronze-light">{SERVICES[active]?.name}</span>
+                <span className="flex flex-col items-end gap-2 text-right">
+                  <span className="eyebrow text-bronze-light">{current?.name}</span>
+                  {current && (
+                    <span className="font-display text-3xl leading-none text-ivory">
+                      {formatPrice(current.price)}
+                    </span>
+                  )}
+                </span>
               </div>
             </div>
           </div>

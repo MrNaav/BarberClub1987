@@ -1,15 +1,7 @@
-import andreImage from "@/assets/barber-andre.jpg";
-import lucasImage from "@/assets/barber-lucas.jpg";
-import rafaelImage from "@/assets/barber-rafael.jpg";
 import { cn } from "@/lib/utils";
 
+import { BARBERS } from "./content";
 import { Reveal } from "./Reveal";
-
-const BARBERS = [
-  { name: "Rafael Mendes", role: "Master Barber", image: rafaelImage },
-  { name: "Lucas Ferreira", role: "Barber", image: lucasImage },
-  { name: "André Costa", role: "Barber", image: andreImage },
-] as const;
 
 export function Barbers() {
   return (
@@ -42,40 +34,42 @@ export function Barbers() {
           </Reveal>
         </div>
 
-        <ul className="mt-16 grid gap-12 sm:grid-cols-2 sm:gap-x-6 lg:mt-24 lg:grid-cols-3 lg:gap-x-8">
+        <ul className="mt-16 grid gap-20 sm:gap-16 lg:mt-24 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0">
           {BARBERS.map((barber, index) => (
             <Reveal
               as="li"
               key={barber.name}
               delay={index * 120}
-              className={cn(
-                index === 0 && "sm:col-span-2 lg:col-span-1",
-                index === 1 && "lg:mt-16",
-                index === 2 && "lg:mt-32",
-              )}
+              className={cn(index === 1 && "lg:mt-16", index === 2 && "lg:mt-32")}
             >
-              <figure className="group">
-                <div
-                  className={cn(
-                    "relative overflow-hidden bg-ink",
-                    index === 0 ? "aspect-[4/5] sm:aspect-[16/11] lg:aspect-[3/4]" : "aspect-[3/4]",
-                  )}
-                >
+              <figure className="group grid gap-7 sm:grid-cols-12 sm:items-end sm:gap-8 lg:block">
+                <div className="relative aspect-[4/5] overflow-hidden bg-ink sm:col-span-5 sm:aspect-[3/4]">
                   <img
                     src={barber.image}
                     alt={`Retrato de ${barber.name}, ${barber.role}`}
                     width={1024}
                     height={1536}
                     loading="lazy"
-                    className="h-full w-full object-cover object-[center_20%] sm:object-[center_10%] lg:object-[center_20%] grayscale-[35%] transition-[transform,filter] duration-[1.2s] ease-[var(--ease-editorial)] group-hover:scale-[1.04] group-hover:grayscale-0"
+                    className="h-full w-full object-cover object-[center_15%] grayscale-[35%] transition-[transform,filter] duration-[1.2s] ease-[var(--ease-editorial)] group-hover:scale-[1.04] group-hover:grayscale-0"
                   />
-                  <span className="absolute left-5 top-5 eyebrow text-ivory/70">0{index + 1}</span>
+                  <span className="eyebrow absolute left-5 top-5 text-ivory/70">0{index + 1}</span>
                 </div>
-                <figcaption className="mt-6 flex items-baseline justify-between gap-4 border-b border-hairline pb-5">
-                  <span className="font-display text-[1.875rem] font-medium leading-none text-ivory sm:text-[2.125rem]">
-                    {barber.name}
-                  </span>
-                  <span className="eyebrow shrink-0 text-bronze">{barber.role}</span>
+
+                <figcaption className="sm:col-span-7 lg:mt-7">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-hairline pb-5">
+                    <span className="font-display text-[1.875rem] font-medium leading-none text-ivory sm:text-[2.25rem] lg:text-[2.125rem]">
+                      {barber.name}
+                    </span>
+                    <span className="eyebrow shrink-0 text-bronze">{barber.role}</span>
+                  </div>
+                  <p className="mt-5 text-[0.9375rem] leading-relaxed text-stone">{barber.bio}</p>
+                  <p className="mt-6 flex items-center gap-3 text-[0.8125rem] text-ivory/85">
+                    <span aria-hidden className="h-px w-6 bg-bronze" />
+                    <span>
+                      <span className="sr-only">Especialidade: </span>
+                      {barber.specialty}
+                    </span>
+                  </p>
                 </figcaption>
               </figure>
             </Reveal>
