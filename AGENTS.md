@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- The landing page is one scrolling page at `/` built from section components in `src/components/site/`; header links are in-page anchors with smooth scroll because the brief asks for a single landing page with section navigation.
+- Brand colors live only as tokens in `src/styles.css` (ink, graphite, bronze, ivory, stone…); components use those token classes, never raw hex, so the fixed brand palette stays enforceable.

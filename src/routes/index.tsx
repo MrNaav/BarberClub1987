@@ -1,23 +1,41 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { About } from "@/components/site/About";
+import { Barbers } from "@/components/site/Barbers";
+import { Hero } from "@/components/site/Hero";
+import { Services } from "@/components/site/Services";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
+
+const TITLE = "Barber Club 1987 — Barbearia tradicional e premium";
+const DESCRIPTION =
+  "Barbearia que une a tradição clássica a uma estética contemporânea. Corte tradicional, barba completa e acabamento com atenção aos detalhes.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: TITLE },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <SiteHeader />
+      <main>
+        <Hero />
+        <About />
+        <Services />
+        <Barbers />
+      </main>
+      <SiteFooter />
+    </>
   );
 }
