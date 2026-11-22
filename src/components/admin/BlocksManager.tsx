@@ -34,7 +34,9 @@ export function BlocksManager({ barberId, barbers }: { barberId: string | null; 
   const [busy, setBusy] = useState(false);
   const [toRemove, setToRemove] = useState<string | null>(null);
 
-  const mine = (blocks.data ?? []).filter((b) => (barberId ? b.barber_id === barberId : b.barber_id === null));
+  const mine = (blocks.data ?? []).filter((b) =>
+    new Date(b.ends_at).getTime() > Date.now() && (barberId ? b.barber_id === barberId : b.barber_id === null),
+  );
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();

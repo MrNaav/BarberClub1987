@@ -5,6 +5,7 @@ import { Logo } from "@/components/site/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { adminHead } from "@/lib/admin/metadata";
+import { validateResetPassword } from "@/lib/auth/password";
 
 export const Route = createFileRoute("/redefinir-senha")({
   head: () => adminHead("Redefinir senha", "Redefinição segura da senha administrativa da Barber Club 1987."),
@@ -29,8 +30,8 @@ function ResetPage() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    if (password.length < 12) { setError("Use uma senha com pelo menos 12 caracteres."); return; }
-    if (password !== confirmation) { setError("As senhas precisam ser iguais."); return; }
+    const problem = validateResetPassword(password, confirmation);
+    if (problem) { setError(problem); return; }
     setBusy(true);
     try {
       const { error: failure } = await supabase.auth.updateUser({ password });

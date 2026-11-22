@@ -29,6 +29,13 @@
       "when": 1795293044544,
       "tag": "0003_audit_atomic_admin_saves",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795308807446,
+      "tag": "0004_audit_lookup_indexes",
+      "breakpoints": true
     }
   ]
 }

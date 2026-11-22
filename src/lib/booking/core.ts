@@ -47,6 +47,11 @@ export function isActiveStatus(status: AppointmentStatus): boolean {
   return status === "pending" || status === "confirmed";
 }
 
+/** A post-appointment buffer is unavailable only while the appointment holds its slot. */
+export function isAppointmentBuffer(status: AppointmentStatus, minute: number, end: number, blockedUntil: number): boolean {
+  return isActiveStatus(status) && minute >= end && minute < blockedUntil;
+}
+
 /** "R$ 75" for whole reais, "R$ 75,50" when there are cents. */
 export function formatPrice(cents: number): string {
   const reais = cents / 100;

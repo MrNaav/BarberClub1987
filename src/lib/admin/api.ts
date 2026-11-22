@@ -125,7 +125,6 @@ export const blocksQuery = queryOptions({
       await supabase
         .from("schedule_blocks")
         .select("*")
-        .gte("ends_at", new Date(Date.now() - 86_400_000).toISOString())
         .order("starts_at"),
     ),
 });

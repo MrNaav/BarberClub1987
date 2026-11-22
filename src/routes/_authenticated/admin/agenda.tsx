@@ -20,6 +20,8 @@ import {
   formatDateLong,
   formatTime,
   friendlyError,
+  isActiveStatus,
+  isAppointmentBuffer,
   localToIso,
   minutesToTime,
   timeToMinutes,
@@ -77,6 +79,9 @@ function buildSegments(opts: {
     start: minutesOfDay(b.starts_at, dateKey),
     end: minutesOfDay(b.ends_at, dateKey),
   }));
+  const buffers = opts.appointments.filter((a) => isActiveStatus(a.status)).map((a) => ({
+    status: a.status, start: minutesOfDay(a.ends_at, dateKey), end: minutesOfDay(a.blocked_until, dateKey),
+  }));
 
   const segments: Segment[] = [];
   for (let t = rangeStart; t < rangeEnd; t += TICK) {
@@ -87,7 +92,7 @@ function buildSegments(opts: {
       const blk = blks.find((x) => t >= x.start && t < x.end);
       if (blk) next = { kind: "block", start: t, end: t + TICK, reason: blk.b.reason };
       else if (!working || t < working.start || t >= working.end) next = { kind: "off", start: t, end: t + TICK };
-      else if (breaks.some(([s, e]) => s !== undefined && e !== undefined && t >= s && t < e)) next = { kind: "break", start: t, end: t + TICK };
+      else if (buffers.some((x) => isAppointmentBuffer(x.status, t, x.start, x.end)) || breaks.some(([s, e]) => s !== undefined && e !== undefined && t >= s && t < e)) next = { kind: "break", start: t, end: t + TICK };
       else next = { kind: "free", start: t, end: t + TICK };
     }
     const last = segments[segments.length - 1];
